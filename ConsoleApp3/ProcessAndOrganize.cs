@@ -162,7 +162,8 @@ namespace Calculator2
             }
         }
 
-        public static List<string> PolynomialMill(string polynomial, List<string> usedParts)
+
+        public static List<string> PolynomialMillMultiplyOrDivide(string polynomial, List<string> usedParts)
         {
 
             if (polynomial != "")
@@ -178,7 +179,7 @@ namespace Calculator2
                 string copyString = String.Join("", copy);
 
 
-                var newPolynomialPartsBefore = GoThroughPolynomial.GoThroughParts(polynomialParts);
+                var newPolynomialPartsBefore = GoThroughPolynomial.GoThroughPartsForMultiplyOrDivide(polynomialParts);
 
                 string newPolynomialPartsStringBefore = String.Join("", newPolynomialPartsBefore);
 
@@ -190,7 +191,7 @@ namespace Calculator2
 
                 if (copyString != newPolynomialPartsString)
                 {
-                    PolynomialMill(newPolynomialPartsString, usedParts);
+                    PolynomialMillMultiplyOrDivide(newPolynomialPartsString, usedParts);
                 }
                 else
                 {
@@ -199,7 +200,56 @@ namespace Calculator2
                     var usedPartsUpdated = shorterPolynomialAndUsedParts.usedParts;
 
                     string shorterPolynomialString = String.Join("", shorterPolynomial);
-                    PolynomialMill(shorterPolynomialString, usedPartsUpdated);
+                    PolynomialMillMultiplyOrDivide(shorterPolynomialString, usedPartsUpdated);
+                }
+            }
+            return usedParts;
+        }
+
+
+
+
+
+
+
+        public static List<string> PolynomialMillAddOrSubtract(string polynomial, List<string> usedParts)
+        {
+
+            if (polynomial != "")
+            {
+                var polynomialParts = FromStringToList(polynomial).polynomialParts;
+
+                List<string> copy = [];
+                foreach (string part in polynomialParts)
+                {
+                    copy.Add(part);
+                }
+
+                string copyString = String.Join("", copy);
+
+
+                var newPolynomialPartsBefore = GoThroughPolynomial.GoThroughPartsForAddOrSubtract(polynomialParts);
+
+                string newPolynomialPartsStringBefore = String.Join("", newPolynomialPartsBefore);
+
+                var newPolynomialParts = FromStringToList(newPolynomialPartsStringBefore).polynomialParts;
+
+                string newPolynomialPartsString = String.Join("", newPolynomialParts);
+
+
+
+                if (copyString != newPolynomialPartsString)
+                {
+                    PolynomialMillAddOrSubtract(newPolynomialPartsString, usedParts);
+                }
+                else
+                {
+                    var shorterPolynomialAndUsedParts = ChewOnPolynomial(newPolynomialParts, usedParts);
+                    var shorterPolynomial = shorterPolynomialAndUsedParts.polynomialParts;
+                    var usedPartsUpdated = shorterPolynomialAndUsedParts.usedParts;
+
+                    string shorterPolynomialString = String.Join("", shorterPolynomial);
+                    PolynomialMillAddOrSubtract(shorterPolynomialString, usedPartsUpdated);
                 }
             }
             return usedParts;

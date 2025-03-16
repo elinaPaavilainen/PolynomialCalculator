@@ -15,8 +15,13 @@ namespace Calculator2
 
                 List<string> usedParts = [];
 
+                usedParts = ProcessAndOrganize.PolynomialMillMultiplyOrDivide(polynomial, usedParts);
 
-                usedParts = ProcessAndOrganize.PolynomialMill(polynomial, usedParts);
+                string middlePolynomial = string.Join("", usedParts);
+
+                usedParts = [];
+
+                usedParts = ProcessAndOrganize.PolynomialMillAddOrSubtract(middlePolynomial, usedParts);
 
                 string finalPolynomial = string.Join("", usedParts);
                 Console.WriteLine(finalPolynomial);

@@ -16,12 +16,19 @@ namespace Calculator2
 
             if (firstContainsLetters == false && secondContainsLetters == false)
             {
-                if (operate == "-")
+
+                first = operate + first;
+
+
+                int resultInt = Convert.ToInt32(first) * Convert.ToInt32(second);
+
+                string result = Convert.ToString(resultInt);
+                if (resultInt >= 0)
                 {
-                    first = operate + first;
+                    result = "+" + result;
                 }
-                int result = Convert.ToInt32(first) * Convert.ToInt32(second);
-                return Convert.ToString(result);
+
+                return result;
             }
 
 
@@ -35,12 +42,16 @@ namespace Calculator2
 
                 if (firstLetters == secondLetters || firstLetters == "" || secondLetters == "")
                 {
-                    if (operate == "-")
+
+                    firstNumbers = operate + firstNumbers;
+
+                    int resultInt = Convert.ToInt32(firstNumbers) * Convert.ToInt32(secondNumbers);
+
+                    string resultNumber = Convert.ToString(resultInt);
+                    if (resultInt >= 0)
                     {
-                        firstNumbers = operate + firstNumbers;
+                        resultNumber = "+" + resultNumber;
                     }
-                    int result = Convert.ToInt32(firstNumbers) * Convert.ToInt32(secondNumbers);
-                    string resultNumber = Convert.ToString(result);
 
                     if (firstLetters != "")
                     {
@@ -52,7 +63,6 @@ namespace Calculator2
                         string finalResult = resultNumber + secondLetters;
                         return finalResult;
                     }
-
                 }
                 else
                 {
@@ -61,6 +71,8 @@ namespace Calculator2
 
             }
         }
+
+        //MUOKKAA täMÄ samanlaiseksi kuin Multiplyssä!!!!
         public static string Divide(string operate, string first, string second)
         {
             bool firstContainsLetters = first.Any(char.IsLetter);
