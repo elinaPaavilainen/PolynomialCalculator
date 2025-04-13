@@ -23,29 +23,6 @@ namespace Calculator2
             return CheckOperation.CheckIfAddOrSubtract(polynomialParts);
 
         }
-
-        //public static List<string> CleanPolynomial(List<string> polynomialParts)
-        //{
-        //    int count = polynomialParts.Count;
-
-        //    string indexesToRemove = "";
-
-        //    for (int i = 0; i < count; i++)
-        //    {
-        //        if (polynomialParts[i].Contains('+') && polynomialParts[i + 1].Contains('+'))
-        //        {
-        //            indexesToRemove += Convert.ToString(i);
-        //        }
-        //        else if (polynomialParts[i].Contains('+') && polynomialParts[i + 1].Contains('-'))
-        //        {
-        //            indexesToRemove += Convert.ToString(i);
-        //        }
-        //        else if (polynomialParts[i].Contains('-') && polynomialParts[i + 1].Contains('-'))
-        //        {
-        //            indexesToRemove += Convert.ToString(i);
-        //        }
-
-        //    }
     }
 }
 

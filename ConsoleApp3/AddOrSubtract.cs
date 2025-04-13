@@ -9,7 +9,13 @@ namespace Calculator2
     public static class AddOrSubtract
     {
         public static string Add(string operate, string first, string second)
-        {
+        { 
+
+            if (first.Contains('^') || second.Contains('^'))
+            {
+                return $"{operate}{first} + {second}";
+            }
+
             bool firstContainsLetters = first.Any(char.IsLetter);
             bool secondContainsLetters = second.Any(char.IsLetter);
 
@@ -50,6 +56,10 @@ namespace Calculator2
         }
         public static string Subtract(string operate, string first, string second)
         {
+            if (first.Contains('^') || second.Contains('^'))
+            {
+                return $"{operate}{first} + {second}";
+            }
             bool firstContainsLetters = first.Any(char.IsLetter);
             bool secondContainsLetters = second.Any(char.IsLetter);
 

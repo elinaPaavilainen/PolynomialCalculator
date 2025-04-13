@@ -18,6 +18,10 @@ namespace Calculator2
                 {
                     numbers += character;
                 }
+                else
+                {
+                    break;
+                }
             }
 
             if (numbers == "")

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -16,9 +17,7 @@ namespace Calculator2
 
             if (firstContainsLetters == false && secondContainsLetters == false)
             {
-
                 first = operate + first;
-
 
                 int resultInt = Convert.ToInt32(first) * Convert.ToInt32(second);
 
@@ -31,9 +30,24 @@ namespace Calculator2
                 return result;
             }
 
-
             else
             {
+                var powerFirst = 0;
+                var powerSecond = 0;
+                if (first.Contains("^"))
+                {
+                    var firstBefore = first;
+                    first = firstBefore.Substring(0, firstBefore.IndexOf("^"));
+                    powerFirst = Convert.ToInt32(firstBefore.Substring(firstBefore.IndexOf("^") + 1));
+                }
+
+                if (second.Contains("^"))
+                {
+                    var secondBefore = second;
+                    second = secondBefore.Substring(0, secondBefore.IndexOf("^"));
+                    powerSecond = Convert.ToInt32(secondBefore.Substring(secondBefore.IndexOf("^") + 1));
+                }
+
                 var firstNumbers = CheckLettersAndNumbers.CheckNumbers(first);
                 var firstLetters = CheckLettersAndNumbers.CheckLetters(first);
 
@@ -53,16 +67,53 @@ namespace Calculator2
                         resultNumber = "+" + resultNumber;
                     }
 
+                    if (firstLetters != "" && secondLetters != "")
+                    {
+                        if (powerFirst == 0 && powerSecond == 0)
+                        {
+                            string finalResult = resultNumber + firstLetters + "^2";
+                            return finalResult;
+                        }
+                        else
+                        {
+                            var power = powerFirst + powerSecond + 1;
+                            string finalResult = resultNumber + firstLetters + "^" + Convert.ToString(power);
+                            return finalResult;
+                        }
+                    }
+
                     if (firstLetters != "")
                     {
-                        string finalResult = resultNumber + firstLetters;
-                        return finalResult;
+                        if (powerFirst > 0)
+                        {
+                            string finalResult = resultNumber + firstLetters + "^" + Convert.ToString(powerFirst);
+                            return finalResult;
+                        }
+                        else
+                        {
+                            string finalResult = resultNumber + firstLetters;
+                            return finalResult;
+                        }
+                    }
+                    else if (secondLetters != "")
+                    {
+                        if (powerSecond > 0)
+                        {
+                            string finalResult = resultNumber + secondLetters + "^" + Convert.ToString(powerSecond);
+                            return finalResult;
+                        }
+                        else
+                        {
+                            string finalResult = resultNumber + secondLetters;
+                            return finalResult;
+                        }
                     }
                     else
                     {
                         string finalResult = resultNumber + secondLetters;
                         return finalResult;
                     }
+
                 }
                 else
                 {
@@ -72,7 +123,6 @@ namespace Calculator2
             }
         }
 
-        //MUOKKAA täMÄ samanlaiseksi kuin Multiplyssä!!!!
         public static string Divide(string operate, string first, string second)
         {
             bool firstContainsLetters = first.Any(char.IsLetter);
@@ -80,30 +130,89 @@ namespace Calculator2
 
             if (firstContainsLetters == false && secondContainsLetters == false)
             {
-                if (operate == "-")
+                first = operate + first;
+
+                int resultInt = Convert.ToInt32(first) / Convert.ToInt32(second);
+                string result = Convert.ToString(resultInt);
+
+                if (resultInt >= 0)
                 {
-                    first = operate + first;
+                    result = "+" + result;
                 }
-                int result = Convert.ToInt32(first) / Convert.ToInt32(second);
-                return Convert.ToString(result);
+                return result;
+
             }
             else
             {
+                // Tätä pitää muokata niin että osaa laskea esim. 1/x !!!!
+
                 var firstNumbers = CheckLettersAndNumbers.CheckNumbers(first);
                 var firstLetters = CheckLettersAndNumbers.CheckLetters(first);
 
                 var secondNumbers = CheckLettersAndNumbers.CheckNumbers(second);
                 var secondLetters = CheckLettersAndNumbers.CheckLetters(second);
 
-                if (firstLetters == secondLetters)
+                if (firstLetters == secondLetters || firstLetters == "" || secondLetters == "")
                 {
-                    if (operate == "-")
-                    {
-                        firstNumbers = operate + firstNumbers;
-                    }
+                    firstNumbers = operate + firstNumbers;
+
                     int result = Convert.ToInt32(firstNumbers) / Convert.ToInt32(secondNumbers);
                     string resultNumber = Convert.ToString(result);
-                    string finalResult = resultNumber + firstLetters;
+                    if (result >= 0)
+                    {
+                        resultNumber = "+" + resultNumber;
+                    }
+                    string finalResult = "";
+
+                    if (firstLetters != "" && secondLetters == "")
+                    {
+                        finalResult = resultNumber + firstLetters;
+                    }
+
+                    else if (firstLetters == "" && secondLetters != "")
+                    {
+                        finalResult = resultNumber + secondLetters;
+                    }
+
+                    else if (firstLetters != "" && secondLetters != "")
+                    {
+                        finalResult = resultNumber;
+                    }
+                    return finalResult;
+
+                }
+                else if (firstLetters.Contains(secondLetters))
+                {
+                    firstNumbers = operate + firstNumbers;
+
+                    int result = Convert.ToInt32(firstNumbers) / Convert.ToInt32(secondNumbers);
+                    string resultNumber = Convert.ToString(result);
+                    if (result >= 0)
+                    {
+                        resultNumber = "+" + resultNumber;
+                    }
+                    string finalResult = "";
+
+                    string finalLetters = firstLetters.Replace(secondLetters, "");
+
+                    finalResult = resultNumber + finalLetters;
+                    return finalResult;
+                }
+                else if (secondLetters.Contains(firstLetters))
+                {
+                    firstNumbers = operate + firstNumbers;
+
+                    int result = Convert.ToInt32(firstNumbers) / Convert.ToInt32(secondNumbers);
+                    string resultNumber = Convert.ToString(result);
+                    if (result >= 0)
+                    {
+                        resultNumber = "+" + resultNumber;
+                    }
+                    string finalResult = "";
+
+                    string finalLetters = secondLetters.Replace(firstLetters, "");
+
+                    finalResult = resultNumber + finalLetters;
                     return finalResult;
                 }
                 else

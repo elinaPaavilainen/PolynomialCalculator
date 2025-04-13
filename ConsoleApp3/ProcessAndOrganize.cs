@@ -1,38 +1,81 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.Design;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Calculator2
+﻿namespace Calculator2
 {
     public static class ProcessAndOrganize
     {
         private static char[] charsToCheck = { '*', '/', '+', '-' };
+
         public static string ProcessPolynomial(string polynomial)
         {
             polynomial = polynomial.Replace(" ", "");
             string newPolynomial = "";
 
-            if (char.IsAsciiLetterOrDigit(polynomial[0]) && polynomial[0] != '+' && polynomial[0] != '-' && polynomial[0] != '(')
+            if (polynomial != "")
             {
-                polynomial = "+" + polynomial;
+                if (char.IsAsciiLetterOrDigit(polynomial[0]) && polynomial[0] != '+' && polynomial[0] != '-')
+                {
+                    polynomial = "+" + polynomial;
+                }
             }
 
-            foreach (char character in polynomial)
+            int polynomialLength = polynomial.Length;
+
+            for (int i = 0; i < polynomialLength; i++)
             {
-                if (charsToCheck.Contains(character))
+                if (polynomial[i] == '*' || polynomial[i] == '/' || polynomial[i] == '+')
                 {
-                    newPolynomial = newPolynomial + " " + character + " ";
+                    if (polynomial[i + 1] == '-')
+                    {
+                        newPolynomial = newPolynomial + polynomial[i];
+                    }
+                    else
+                    {
+                        newPolynomial = newPolynomial + polynomial[i] + " ";
+                    }
                 }
+                else if (polynomial[i] == '-')
+                {
+                    if (i > 0)
+                    {
+                        if (polynomial[i - 1] == '*' || polynomial[i - 1] == '/' || polynomial[i - 1] == '+' || polynomial[i - 1] == '-')
+                        {
+                            newPolynomial = newPolynomial + " " + polynomial[i];
+                        }
+                        else
+                        {
+                            newPolynomial = newPolynomial + " " + polynomial[i] + " ";
+                        }
+                    }
+                    else
+                    {
+                        newPolynomial = newPolynomial + " " + polynomial[i] + " ";
+                    }
+                }
+
                 else
                 {
-                    newPolynomial = newPolynomial + character;
+                    try
+                    {
+                        if (char.IsAsciiLetterOrDigit(polynomial[i]) && char.IsAsciiLetterOrDigit(polynomial[i + 1]))
+                        {
+                            newPolynomial = newPolynomial + polynomial[i];
+                        }
+                        else if (char.IsAsciiLetterOrDigit(polynomial[i]) && polynomial[i + 1] == '^')
+                        {
+                            newPolynomial = newPolynomial + polynomial[i];
+                        }
+                        else if (polynomial[i] == '^')
+                        {
+                            newPolynomial = newPolynomial + polynomial[i];
+                        }
+                        else
+                        {
+                            newPolynomial = newPolynomial + polynomial[i] + " ";
+                        }
+                    }
+                    catch
+                    {
+                        newPolynomial = newPolynomial + polynomial[i] + " ";
+                    }
                 }
             }
             return newPolynomial.Trim();
@@ -51,63 +94,103 @@ namespace Calculator2
             }
             return string.Join(" ", uniqueLetters);
         }
-        public static List<string> OrganizePolynomial(string polynomial, string differentLetters)
+        public static List<string> OrganizePolynomial(string polynomial, string differentLettersNotInOrder)
         {
+            string differentLettersWithWhiteSpace = new string(differentLettersNotInOrder.OrderBy(c => c).ToArray());
+            string differentLetters = differentLettersWithWhiteSpace.Replace(" ", "");
 
-            //tee kerto ja jakolaskulle oma tarkistus
 
-            string[] polynomialPartsArray = polynomial.Split(' ');
+            string[] polynomialPartsArray = polynomial.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             List<string> polynomialParts = polynomialPartsArray.ToList();
 
             int polynomialPartsCount = polynomialParts.Count;
 
             List<string> withLettersParts = new List<string>();
             List<string> noLetterParts = new List<string>();
-
-
-
-            
-
-
-           
+            List<string> leaveBeParts = new List<string>();
 
             foreach (var letterCharacter in differentLetters)
             {
-                for (int i = 0; i < polynomialPartsCount; i++)
+                for (int i = 1; i < polynomialPartsCount; i++)
                 {
-                    foreach (char character in charsToCheck)
+                    if (i < polynomialPartsCount - 1)
                     {
-                        if (!polynomialParts[i].Contains(character))
+                        if (polynomialParts[i - 1] != "*" && polynomialParts[i - 1] != "/" && polynomialParts[i + 1] != "*" && polynomialParts[i + 1] != "/")
                         {
-                            if (polynomialParts[i].Contains(letterCharacter))
+                            if (polynomialParts[i].Contains(letterCharacter) && !polynomialParts[i].Contains('^'))
                             {
-                                withLettersParts.Add(polynomialParts[i-1]);
+                                withLettersParts.Add(polynomialParts[i - 1]);
                                 withLettersParts.Add(polynomialParts[i]);
-                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (polynomialParts[i - 1] != "*" && polynomialParts[i - 1] != "/")
+                        {
+                            if (polynomialParts[i].Contains(letterCharacter) && !polynomialParts[i].Contains('^'))
+                            {
+                                withLettersParts.Add(polynomialParts[i - 1]);
+                                withLettersParts.Add(polynomialParts[i]);
+                                //break;
                             }
                         }
                     }
                 }
             }
-            for (int i = 0; i < polynomialPartsCount; i++)
+
+            for (int i = 1; i < polynomialPartsCount; i++)
             {
-                foreach (char character in charsToCheck)
+                if (i < polynomialPartsCount - 1)
                 {
-                    if (!polynomialParts[i].Contains(character))
+                    if (polynomialParts[i - 1] != "*" && polynomialParts[i - 1] != "/" && polynomialParts[i + 1] != "*" && polynomialParts[i + 1] != "/")
                     {
                         if (polynomialParts[i].All(char.IsDigit))
                         {
                             noLetterParts.Add(polynomialParts[i - 1]);
                             noLetterParts.Add(polynomialParts[i]);
-                            break;
                         }
+                        else if (polynomialParts[i].Contains('^'))
+                        {
+                            leaveBeParts.Add(polynomialParts[i - 1]);
+                            leaveBeParts.Add(polynomialParts[i]);
+                        }
+                    }
+                    else
+                    {
+                        leaveBeParts.Add(polynomialParts[i - 1]);
+                        leaveBeParts.Add(polynomialParts[i]);
+                        //break;
+                    }
+                }
+                else
+                {
+                    if (polynomialParts[i - 1] != "*" && polynomialParts[i - 1] != "/")
+                    {
+                        if (polynomialParts[i].All(char.IsDigit))
+                        {
+                            noLetterParts.Add(polynomialParts[i - 1]);
+                            noLetterParts.Add(polynomialParts[i]);
+                            //break;
+                        }
+                        else if (polynomialParts[i].Contains('^'))
+                        {
+                            leaveBeParts.Add(polynomialParts[i - 1]);
+                            leaveBeParts.Add(polynomialParts[i]);
+                        }
+                    }
+                    else
+                    {
+                        leaveBeParts.Add(polynomialParts[i - 1]);
+                        leaveBeParts.Add(polynomialParts[i]);
+                        //break;
                     }
                 }
             }
-            List<string> newPolynomial = withLettersParts.Concat(noLetterParts).ToList();
 
-            //foreach (string part in newPolynomial)
-            //    Console.WriteLine(part);
+            List<string> newPolynomialPart1 = leaveBeParts.Concat(withLettersParts).ToList();
+            List<string> newPolynomial = newPolynomialPart1.Concat(noLetterParts).ToList();
+
             return newPolynomial;
         }
         public static List<string> ModifyPolynomialParts(List<string> polynomialParts, int indexOfOperator, string newPart)
@@ -154,6 +237,7 @@ namespace Calculator2
             }
             else
             {
+
                 partsToReturn.Add(polynomialParts[0]);
                 partsToReturn.Add(polynomialParts[1]);
                 int count = partsToReturn.Count;
@@ -162,62 +246,45 @@ namespace Calculator2
             }
         }
 
-
-        public static List<string> PolynomialMillMultiplyOrDivide(string polynomial, List<string> usedParts)
+        public static (List<string> newPolynomialParts, bool newRound) PolynomialMillMultiplyOrDivide(string polynomial)
         {
+            bool newRound = true;
+            var polynomialParts = FromStringToList(polynomial);
 
-            if (polynomial != "")
+            List<string> copy = [];
+            foreach (string part in polynomialParts)
             {
-                var polynomialParts = FromStringToList(polynomial).polynomialParts;
-
-                List<string> copy = [];
-                foreach (string part in polynomialParts)
-                {
-                    copy.Add(part);
-                }
-
-                string copyString = String.Join("", copy);
-
-
-                var newPolynomialPartsBefore = GoThroughPolynomial.GoThroughPartsForMultiplyOrDivide(polynomialParts);
-
-                string newPolynomialPartsStringBefore = String.Join("", newPolynomialPartsBefore);
-
-                var newPolynomialParts = FromStringToList(newPolynomialPartsStringBefore).polynomialParts;
-
-                string newPolynomialPartsString = String.Join("", newPolynomialParts);
-
-
-
-                if (copyString != newPolynomialPartsString)
-                {
-                    PolynomialMillMultiplyOrDivide(newPolynomialPartsString, usedParts);
-                }
-                else
-                {
-                    var shorterPolynomialAndUsedParts = ChewOnPolynomial(newPolynomialParts, usedParts);
-                    var shorterPolynomial = shorterPolynomialAndUsedParts.polynomialParts;
-                    var usedPartsUpdated = shorterPolynomialAndUsedParts.usedParts;
-
-                    string shorterPolynomialString = String.Join("", shorterPolynomial);
-                    PolynomialMillMultiplyOrDivide(shorterPolynomialString, usedPartsUpdated);
-                }
+                copy.Add(part);
             }
-            return usedParts;
+
+            string copyString = String.Join("", copy);
+
+            var newPolynomialPartsBefore = GoThroughPolynomial.GoThroughPartsForMultiplyOrDivide(polynomialParts);
+
+            string newPolynomialPartsStringBefore = String.Join("", newPolynomialPartsBefore);
+
+            var newPolynomialParts = FromStringToList(newPolynomialPartsStringBefore);
+
+            string newPolynomialPartsString = String.Join("", newPolynomialParts);
+
+            if (copyString != newPolynomialPartsString)
+            {
+                return (newPolynomialParts, newRound);
+                //newPolynomialParts =  PolynomialMillMultiplyOrDivide(newPolynomialPartsString);
+                //return newPolynomialParts;
+            }
+            else
+            {
+                newRound = false;
+                return (newPolynomialParts, newRound);
+            }
         }
-
-
-
-
-
-
 
         public static List<string> PolynomialMillAddOrSubtract(string polynomial, List<string> usedParts)
         {
-
             if (polynomial != "")
             {
-                var polynomialParts = FromStringToList(polynomial).polynomialParts;
+                var polynomialParts = FromStringToListOrganize(polynomial).polynomialParts;
 
                 List<string> copy = [];
                 foreach (string part in polynomialParts)
@@ -226,17 +293,14 @@ namespace Calculator2
                 }
 
                 string copyString = String.Join("", copy);
-
 
                 var newPolynomialPartsBefore = GoThroughPolynomial.GoThroughPartsForAddOrSubtract(polynomialParts);
 
                 string newPolynomialPartsStringBefore = String.Join("", newPolynomialPartsBefore);
 
-                var newPolynomialParts = FromStringToList(newPolynomialPartsStringBefore).polynomialParts;
+                var newPolynomialParts = FromStringToListOrganize(newPolynomialPartsStringBefore).polynomialParts;
 
                 string newPolynomialPartsString = String.Join("", newPolynomialParts);
-
-
 
                 if (copyString != newPolynomialPartsString)
                 {
@@ -257,21 +321,28 @@ namespace Calculator2
 
         public static (List<string> polynomialParts, List<string> usedParts) ChewOnPolynomial(List<string> polynomialParts, List<string> usedParts)
         {
+            if (polynomialParts.Count > 0)
+            {
+                var usedPartsAndTheirCount = ProcessAndOrganize.RemoveAndSaveFirstTerm(polynomialParts);
 
-            var usedPartsAndTheirCount = ProcessAndOrganize.RemoveAndSaveFirstTerm(polynomialParts);
+                usedParts.AddRange(usedPartsAndTheirCount.partsToReturn);
+                int countOfReturnedParts = usedPartsAndTheirCount.countOfPartsToReturn;
 
-            usedParts.AddRange(usedPartsAndTheirCount.partsToReturn);
-            int countOfReturnedParts = usedPartsAndTheirCount.countOfPartsToReturn;
-
-            polynomialParts.RemoveRange(0, countOfReturnedParts);
+                polynomialParts.RemoveRange(0, countOfReturnedParts);
 
 
 
-            return (polynomialParts, usedParts);
+                return (polynomialParts, usedParts);
+            }
+            else
+            {
+                return (polynomialParts, usedParts);
+
+            }
         }
 
 
-        public static (List<string> polynomialParts, string differentLetters) FromStringToList(string polynomial)
+        public static (List<string> polynomialParts, string differentLetters) FromStringToListOrganize(string polynomial)
         {
             polynomial = ProcessAndOrganize.ProcessPolynomial(polynomial);
 
@@ -281,26 +352,13 @@ namespace Calculator2
 
             return (polynomialParts, differentLetters);
         }
+
+        public static List<string> FromStringToList(string polynomial)
+        {
+            polynomial = ProcessPolynomial(polynomial);
+            string[] polynomialPartsArray = polynomial.Split(' ');
+            List<string> polynomialParts = polynomialPartsArray.ToList();
+            return polynomialParts;
+        }
     }
 }
-
-
-
-//var newPolynomialParts = GoThroughPolynomial.GoThroughParts(polynomialParts);
-
-
-
-//var newerPolynomialParts = GoThroughPolynomial.GoThroughParts(newPolynomialParts);
-
-//newerPolynomialParts.ForEach(Console.WriteLine);
-//Console.WriteLine();
-
-//var newerNewerPolynomialParts = GoThroughPolynomial.GoThroughParts(newerPolynomialParts);
-
-//newerNewerPolynomialParts.ForEach(Console.WriteLine);
-//Console.WriteLine();
-
-//var newerNewerPolynomialParts2 = GoThroughPolynomial.GoThroughParts(newerNewerPolynomialParts);
-
-//newerNewerPolynomialParts2.ForEach(Console.WriteLine);
-//Console.WriteLine();
