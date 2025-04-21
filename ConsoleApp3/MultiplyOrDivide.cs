@@ -113,10 +113,17 @@ namespace Calculator2
                         string finalResult = resultNumber + secondLetters;
                         return finalResult;
                     }
-
                 }
                 else
                 {
+                    if(powerFirst > 0)
+                    {
+                        first = first + "^" + Convert.ToString(powerFirst);
+                    }
+                    if (powerSecond > 0)
+                    {
+                        second = second + "^" + Convert.ToString(powerSecond);
+                    }
                     return $"{operate}{first} * {second}";
                 }
 
@@ -132,10 +139,10 @@ namespace Calculator2
             {
                 first = operate + first;
 
-                int resultInt = Convert.ToInt32(first) / Convert.ToInt32(second);
-                string result = Convert.ToString(resultInt);
+                double resultDouble = Convert.ToDouble(first) / Convert.ToDouble(second);
+                string result = Convert.ToString(resultDouble);
 
-                if (resultInt >= 0)
+                if (resultDouble >= 0)
                 {
                     result = "+" + result;
                 }
@@ -152,32 +159,53 @@ namespace Calculator2
                 var secondNumbers = CheckLettersAndNumbers.CheckNumbers(second);
                 var secondLetters = CheckLettersAndNumbers.CheckLetters(second);
 
-                if (firstLetters == secondLetters || firstLetters == "" || secondLetters == "")
+                if (firstNumbers == "")
+                {
+                    firstNumbers = "1";
+                }
+
+                if (secondNumbers == "")
+                {
+                    secondNumbers = "1";
+                }
+
+                //jaa tämä eri osiin
+                if (firstLetters == secondLetters)// || firstLetters == "" || secondLetters == "")
                 {
                     firstNumbers = operate + firstNumbers;
 
-                    int result = Convert.ToInt32(firstNumbers) / Convert.ToInt32(secondNumbers);
+                    double result = Convert.ToDouble(firstNumbers) / Convert.ToDouble(secondNumbers);
                     string resultNumber = Convert.ToString(result);
                     if (result >= 0)
                     {
                         resultNumber = "+" + resultNumber;
                     }
-                    string finalResult = "";
+                    string finalResult = resultNumber;
 
-                    if (firstLetters != "" && secondLetters == "")
+                    //if (firstLetters != "" && secondLetters == "")
+                    //{
+                    //    finalResult = resultNumber + firstLetters;
+                    //}
+
+                    //else if (firstLetters == "" && secondLetters != "")
+                    //{
+                    //    finalResult = resultNumber + secondLetters;
+                    //}
+
+                    //else if (firstLetters != "" && secondLetters != "")
+                    //{
+                    //    finalResult = resultNumber;
+                    //}
+                    return finalResult;
+                }
+                else if(secondLetters == "" && secondNumbers == "1") 
+                {
+                    string finalResult = firstNumbers + firstLetters;
+                    if (Convert.ToDouble(firstNumbers) >= 0)
                     {
-                        finalResult = resultNumber + firstLetters;
+                        finalResult = "+" + finalResult;
                     }
 
-                    else if (firstLetters == "" && secondLetters != "")
-                    {
-                        finalResult = resultNumber + secondLetters;
-                    }
-
-                    else if (firstLetters != "" && secondLetters != "")
-                    {
-                        finalResult = resultNumber;
-                    }
                     return finalResult;
 
                 }
@@ -219,7 +247,6 @@ namespace Calculator2
                 {
                     return $"{operate}{first} / {second}";
                 }
-
             }
         }
     }

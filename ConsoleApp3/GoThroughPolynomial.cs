@@ -4,8 +4,6 @@ namespace Calculator2
 {
     public static class GoThroughPolynomial
     {
-
-
         public static List<string> GoThroughPartsForMultiplyOrDivide(List<string> polynomialParts)
         {
             if (polynomialParts.Any(item => item.Contains('*')) || polynomialParts.Any(item => item.Contains('/')))

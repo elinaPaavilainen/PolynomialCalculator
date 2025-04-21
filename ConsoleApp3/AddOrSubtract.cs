@@ -40,7 +40,7 @@ namespace Calculator2
                 {
                     if (operate == "-")
                     {
-                        first = operate + first;
+                        firstNumbers = operate + firstNumbers;
                     }
                     int result = Convert.ToInt32(firstNumbers) + Convert.ToInt32(secondNumbers);
                     string resultNumber = Convert.ToString(result);
@@ -88,8 +88,18 @@ namespace Calculator2
                     }
                     int result = Convert.ToInt32(firstNumbers) - Convert.ToInt32(secondNumbers);
                     string resultNumber = Convert.ToString(result);
-                    string finalResult = resultNumber + firstLetters;
-                    return finalResult;
+
+                    if (result == 0)
+                    {
+                        string finalResult = "0";
+                        return finalResult;
+                    }
+                    else
+                    { 
+                        string finalResult = resultNumber + firstLetters;
+                        return finalResult;
+                    }
+                    
                 }
                 else
                 {

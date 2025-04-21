@@ -59,6 +59,14 @@
                         {
                             newPolynomial = newPolynomial + polynomial[i];
                         }
+                        else if (polynomial[i] == ',')
+                        {
+                            newPolynomial = newPolynomial + polynomial[i];
+                        }
+                        else if (char.IsAsciiDigit(polynomial[i]) && polynomial[i + 1] == ',')
+                        {
+                            newPolynomial = newPolynomial + polynomial[i];
+                        }
                         else if (char.IsAsciiLetterOrDigit(polynomial[i]) && polynomial[i + 1] == '^')
                         {
                             newPolynomial = newPolynomial + polynomial[i];
@@ -132,7 +140,7 @@
                             {
                                 withLettersParts.Add(polynomialParts[i - 1]);
                                 withLettersParts.Add(polynomialParts[i]);
-                                //break;
+
                             }
                         }
                     }
@@ -141,11 +149,11 @@
 
             for (int i = 1; i < polynomialPartsCount; i++)
             {
-                if (i < polynomialPartsCount - 1)
+                if (i < polynomialPartsCount - 1 && charsToCheck.Any(polynomialParts[i].Contains) == false)
                 {
                     if (polynomialParts[i - 1] != "*" && polynomialParts[i - 1] != "/" && polynomialParts[i + 1] != "*" && polynomialParts[i + 1] != "/")
                     {
-                        if (polynomialParts[i].All(char.IsDigit))
+                        if (!polynomialParts[i].Any(char.IsLetter))
                         {
                             noLetterParts.Add(polynomialParts[i - 1]);
                             noLetterParts.Add(polynomialParts[i]);
@@ -165,13 +173,12 @@
                 }
                 else
                 {
-                    if (polynomialParts[i - 1] != "*" && polynomialParts[i - 1] != "/")
+                    if (polynomialParts[i - 1] != "*" && polynomialParts[i - 1] != "/" && charsToCheck.Any(polynomialParts[i].Contains) == false)
                     {
-                        if (polynomialParts[i].All(char.IsDigit))
+                        if (!polynomialParts[i].Any(char.IsLetter))
                         {
                             noLetterParts.Add(polynomialParts[i - 1]);
                             noLetterParts.Add(polynomialParts[i]);
-                            //break;
                         }
                         else if (polynomialParts[i].Contains('^'))
                         {
@@ -181,9 +188,12 @@
                     }
                     else
                     {
-                        leaveBeParts.Add(polynomialParts[i - 1]);
-                        leaveBeParts.Add(polynomialParts[i]);
-                        //break;
+                        if (charsToCheck.Any(polynomialParts[i].Contains) == false)
+                        {
+                            leaveBeParts.Add(polynomialParts[i - 1]);
+                            leaveBeParts.Add(polynomialParts[i]);
+                        }
+                        continue;
                     }
                 }
             }
@@ -200,7 +210,6 @@
                 polynomialParts.RemoveAt(indexOfOperator - 2);
             }
             polynomialParts.Insert(indexOfOperator - 2, newPart);
-            //polynomialParts.ForEach(Console.WriteLine);
             return polynomialParts;
         }
 
@@ -214,20 +223,41 @@
                 for (int i = 0; i < polynomialPartsCount; i++)
 
                 {
-                    if ((polynomialParts[i] == "+" || polynomialParts[i] == "-") && (polynomialParts[i + 2] != "*" || polynomialParts[i + 2] != "/"))
+                    if ((polynomialParts[i] == "+" || polynomialParts[i] == "-") && (polynomialParts[i + 2] != "*" && polynomialParts[i + 2] != "/"))
                     {
                         partsToReturn.Add(polynomialParts[i]);
                         partsToReturn.Add(polynomialParts[i + 1]);
                         break;
                     }
-
-                    if ((polynomialParts[i] == "+" || polynomialParts[i] == "-") && (polynomialParts[i + 2] == "*" || polynomialParts[i + 2] == "/") && (polynomialParts[i + 4] != "*" || polynomialParts[i + 4] != "/"))
+                    if (polynomialPartsCount == 4)
                     {
-                        partsToReturn.Add(polynomialParts[i]);
-                        partsToReturn.Add(polynomialParts[i + 1]);
-                        partsToReturn.Add(polynomialParts[i + 2]);
-                        partsToReturn.Add(polynomialParts[i + 3]);
-                        break;
+                        if ((polynomialParts[i] == "+" || polynomialParts[i] == "-") && (polynomialParts[i + 2] == "*" || polynomialParts[i + 2] == "/"))
+                        {
+                            partsToReturn.Add(polynomialParts[i]);
+                            partsToReturn.Add(polynomialParts[i + 1]);
+                            partsToReturn.Add(polynomialParts[i + 2]);
+                            partsToReturn.Add(polynomialParts[i + 3]);
+                            break;
+                        }
+                    }
+                    if (polynomialPartsCount > 4)
+                    {
+                        if ((polynomialParts[i] == "+" || polynomialParts[i] == "-") && (polynomialParts[i + 2] == "*" || polynomialParts[i + 2] == "/") && (polynomialParts[i + 4] != "*" || polynomialParts[i + 4] != "/"))
+                        {
+                            partsToReturn.Add(polynomialParts[i]);
+                            partsToReturn.Add(polynomialParts[i + 1]);
+                            partsToReturn.Add(polynomialParts[i + 2]);
+                            partsToReturn.Add(polynomialParts[i + 3]);
+                            break;
+                        }
+                        if ((polynomialParts[i] == "+" || polynomialParts[i] == "-") && (polynomialParts[i + 2] == "*" || polynomialParts[i + 2] == "/") && (polynomialParts[i + 4] == "*" || polynomialParts[i + 4] == "/"))
+                        {
+                            partsToReturn.Add(polynomialParts[i]);
+                            partsToReturn.Add(polynomialParts[i + 1]);
+                            partsToReturn.Add(polynomialParts[i + 2]);
+                            //partsToReturn.Add(polynomialParts[i + 3]);
+                            break;
+                        }
                     }
                 }
 
@@ -246,7 +276,7 @@
             }
         }
 
-        public static (List<string> newPolynomialParts, bool newRound) PolynomialMillMultiplyOrDivide(string polynomial)
+        public static (List<string> newPolynomialParts, bool newRound, List<string> usedParts) PolynomialProcessMultiplyOrDivide(string polynomial, List<string> usedParts)
         {
             bool newRound = true;
             var polynomialParts = FromStringToList(polynomial);
@@ -269,18 +299,38 @@
 
             if (copyString != newPolynomialPartsString)
             {
-                return (newPolynomialParts, newRound);
-                //newPolynomialParts =  PolynomialMillMultiplyOrDivide(newPolynomialPartsString);
-                //return newPolynomialParts;
+                return (newPolynomialParts, newRound, usedParts);
             }
             else
             {
-                newRound = false;
-                return (newPolynomialParts, newRound);
+                if (newPolynomialPartsString.Contains('*') || newPolynomialPartsString.Contains('/'))
+                {
+                    var shorterPolynomialAndUsedParts = RemoveUsedParts(newPolynomialParts, usedParts);
+                    var shorterPolynomial = shorterPolynomialAndUsedParts.polynomialParts;
+                    var usedPartsUpdated = shorterPolynomialAndUsedParts.usedParts;
+
+                    string shorterPolynomialString = String.Join("", shorterPolynomial);
+
+                    if (shorterPolynomialString.Contains('*') || shorterPolynomialString.Contains('/'))
+                    {
+                        newRound = true;
+                        return (shorterPolynomial, newRound, usedParts);
+                    }
+                    else
+                    {
+                        newRound = false;
+                        return (newPolynomialParts, newRound, usedParts);
+                    }
+                }
+                else
+                {
+                    newRound = false;
+                    return (newPolynomialParts, newRound, usedParts);
+                }
             }
         }
 
-        public static List<string> PolynomialMillAddOrSubtract(string polynomial, List<string> usedParts)
+        public static List<string> PolynomialProcessAddOrSubtract(string polynomial, List<string> usedParts)
         {
             if (polynomial != "")
             {
@@ -304,22 +354,22 @@
 
                 if (copyString != newPolynomialPartsString)
                 {
-                    PolynomialMillAddOrSubtract(newPolynomialPartsString, usedParts);
+                    PolynomialProcessAddOrSubtract(newPolynomialPartsString, usedParts);
                 }
                 else
                 {
-                    var shorterPolynomialAndUsedParts = ChewOnPolynomial(newPolynomialParts, usedParts);
+                    var shorterPolynomialAndUsedParts = RemoveUsedParts(newPolynomialParts, usedParts);
                     var shorterPolynomial = shorterPolynomialAndUsedParts.polynomialParts;
                     var usedPartsUpdated = shorterPolynomialAndUsedParts.usedParts;
 
                     string shorterPolynomialString = String.Join("", shorterPolynomial);
-                    PolynomialMillAddOrSubtract(shorterPolynomialString, usedPartsUpdated);
+                    PolynomialProcessAddOrSubtract(shorterPolynomialString, usedPartsUpdated);
                 }
             }
             return usedParts;
         }
 
-        public static (List<string> polynomialParts, List<string> usedParts) ChewOnPolynomial(List<string> polynomialParts, List<string> usedParts)
+        public static (List<string> polynomialParts, List<string> usedParts) RemoveUsedParts(List<string> polynomialParts, List<string> usedParts)
         {
             if (polynomialParts.Count > 0)
             {
@@ -329,8 +379,6 @@
                 int countOfReturnedParts = usedPartsAndTheirCount.countOfPartsToReturn;
 
                 polynomialParts.RemoveRange(0, countOfReturnedParts);
-
-
 
                 return (polynomialParts, usedParts);
             }

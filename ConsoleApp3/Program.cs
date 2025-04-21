@@ -8,9 +8,10 @@ namespace Calculator2
         {
             string? polynomial = "-23 + 2x + 9a - 4a - 23x - 18";
             string input = "";
+            List<string> polynomialParts;
             string finalPolynomial = "";
 
-            // koita tällä 2x-2x-2-x-2x*2x*2*x
+            // koita tällä 3a+2a*3a+4+3*12+2a
             while (input != "0")
             {
                 Console.WriteLine("Give a polynomial or assign a value to a variable:");
@@ -20,24 +21,25 @@ namespace Calculator2
                 {
                     input.Replace(" ", "");
                     int indexOfVariableLetter = input.IndexOf('=') - 1;
-                    int index = input.IndexOf("=");
+                    //int index = input.IndexOf("=");
                     int indexOfVariableNumber = input.IndexOf("=") + 1;
 
                     char letter = input[indexOfVariableLetter];
 
                     int indexOfLetterInPolynomial = finalPolynomial.IndexOf(letter);
+                    string variableNumber = "";
 
-                    string multiplyCharAndVariableNumber = "*" + input.Substring(indexOfVariableNumber);
-                    polynomial = finalPolynomial.Replace(Convert.ToString(input[indexOfVariableLetter]), multiplyCharAndVariableNumber);
-                    //Console.WriteLine(polynomial);
-                    //Console.WriteLine();
+                    if (finalPolynomial[indexOfLetterInPolynomial - 1] == '/')
+                    {
+                        variableNumber = input.Substring(indexOfVariableNumber);
+                    }
+                    else
+                    {
+                        variableNumber = "*" + input.Substring(indexOfVariableNumber);
+                    }
+                    polynomial = finalPolynomial.Replace(Convert.ToString(input[indexOfVariableLetter]), variableNumber);
 
-                    var polynomialParts = ProcessAndOrganize.FromStringToList(polynomial);
-
-                    //foreach ( var polynomialPart in polynomialParts )
-                    //{
-                    //    Console.WriteLine(polynomialPart);
-                    //}                    
+                    polynomialParts = ProcessAndOrganize.FromStringToList(polynomial);
 
                     for (int i = 0; i < polynomialParts.Count; i++)
                     {
@@ -48,14 +50,8 @@ namespace Calculator2
                             int power = Convert.ToInt32(polynomialParts[i].Substring(indexOfPower + 1));
                             string powerResult = Convert.ToString(Math.Pow(baseNum, power));
 
-                            //polynomial = polynomial.Remove(indexOfLetterInPolynomial + 1);
-                            //polynomial = polynomial.Remove(indexOfLetterInPolynomial + 1);
-                            //polynomial = polynomial.Remove(indexOfLetterInPolynomial + 1);
-                            //polynomial = polynomial + powerResult;
                             polynomialParts[i] = powerResult;
                             polynomial = string.Join("", polynomialParts);
-                            Console.WriteLine(polynomial);
-
                         }
                     }
                 }
@@ -64,26 +60,62 @@ namespace Calculator2
                     polynomial = input;
                 }
 
-
-
+                List<string> usedParts = [];
                 List<string> middlePolynomialParts = [];
+                bool newRound;
 
-                bool newRound = true;
+                if (polynomial.Contains('*') || polynomial.Contains('/'))
+                {
+                    newRound = true;
+                }
+                else
+                {
+                    newRound = false;
+                }
+                polynomialParts = ProcessAndOrganize.FromStringToList(polynomial);
+                polynomial = string.Join("", polynomialParts);
+
                 while (newRound)
                 {
-                    var middlePolynomialPartsAndNewRound = ProcessAndOrganize.PolynomialMillMultiplyOrDivide(polynomial);
+                    var middlePolynomialPartsAndNewRound = ProcessAndOrganize.PolynomialProcessMultiplyOrDivide(polynomial, usedParts);
                     newRound = middlePolynomialPartsAndNewRound.newRound;
                     middlePolynomialParts = middlePolynomialPartsAndNewRound.newPolynomialParts;
+                    usedParts = middlePolynomialPartsAndNewRound.usedParts;
+
                     polynomial = string.Join("", middlePolynomialParts);
                 }
 
+                usedParts = ProcessAndOrganize.PolynomialProcessAddOrSubtract(polynomial, usedParts);
 
-
-                //string middlePolynomial = string.Join("", middlePolynomialParts);
-
-                List<string> usedParts = [];
-
-                usedParts = ProcessAndOrganize.PolynomialMillAddOrSubtract(polynomial, usedParts);
+                for (int i = 0; i < usedParts.Count; i++)
+                {
+                    if (usedParts[0] == "+")
+                    {
+                        usedParts[0] = "";
+                    }
+                    if (usedParts[i] == "0")
+                    {
+                        if (usedParts.Count > 2)
+                        {
+                            usedParts[i-1] = "";
+                            usedParts[i] = "";
+                        }
+                    }
+                    if (usedParts[i].Length > 1)
+                    {
+                        if (usedParts[i][0] == '1' && Char.IsLetter(usedParts[i][1]))
+                        {
+                            usedParts[i] = usedParts[i].Remove(0, 1);
+                        }
+                    }
+                    if (i > 1)
+                    {
+                        if ((usedParts[i - 1] == "*" || usedParts[i - 1] == "/") && usedParts[i] == "+")
+                        {
+                            usedParts.RemoveAt(i);
+                        }
+                    }
+                }
 
                 finalPolynomial = string.Join("", usedParts);
 
