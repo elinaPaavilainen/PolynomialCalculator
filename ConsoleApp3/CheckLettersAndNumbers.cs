@@ -41,7 +41,8 @@ namespace Calculator2
                     letters += character;
                 }
             }
-            return letters;
+            string sortedLetters = new(letters.OrderBy(c => c).ToArray());
+            return sortedLetters;
         }
     }
 }

@@ -116,17 +116,23 @@ namespace Calculator2
                 }
                 else
                 {
-                    if(powerFirst > 0)
+                    if (powerFirst == 0 && powerSecond == 0)
+                    {
+                        int result = Convert.ToInt32(firstNumbers) * Convert.ToInt32(secondNumbers);
+                        string finalResult = result.ToString() + firstLetters + secondLetters;
+                        if (result > 0)
+                        {
+                            finalResult = "+" + finalResult;
+                        }
+                        return finalResult;
+                    }
+                    else 
                     {
                         first = first + "^" + Convert.ToString(powerFirst);
-                    }
-                    if (powerSecond > 0)
-                    {
                         second = second + "^" + Convert.ToString(powerSecond);
-                    }
-                    return $"{operate}{first} * {second}";
+                        return $"{operate}{first} * {second}";
+                    }                      
                 }
-
             }
         }
 
@@ -151,7 +157,7 @@ namespace Calculator2
             }
             else
             {
-                // Tätä pitää muokata niin että osaa laskea esim. 1/x !!!!
+                
 
                 var firstNumbers = CheckLettersAndNumbers.CheckNumbers(first);
                 var firstLetters = CheckLettersAndNumbers.CheckLetters(first);
@@ -198,7 +204,7 @@ namespace Calculator2
                     //}
                     return finalResult;
                 }
-                else if(secondLetters == "" && secondNumbers == "1") 
+                else if (secondLetters == "" && secondNumbers == "1")
                 {
                     string finalResult = firstNumbers + firstLetters;
                     if (Convert.ToDouble(firstNumbers) >= 0)

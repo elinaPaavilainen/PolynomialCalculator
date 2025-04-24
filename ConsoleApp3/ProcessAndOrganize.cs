@@ -1,4 +1,6 @@
-﻿namespace Calculator2
+﻿using System.Text.RegularExpressions;
+
+namespace Calculator2
 {
     public static class ProcessAndOrganize
     {
@@ -117,6 +119,8 @@
             List<string> noLetterParts = new List<string>();
             List<string> leaveBeParts = new List<string>();
 
+            //string letters = new string(polynomialParts[i].Where(char.IsLetter).ToArray());
+
             foreach (var letterCharacter in differentLetters)
             {
                 for (int i = 1; i < polynomialPartsCount; i++)
@@ -127,8 +131,18 @@
                         {
                             if (polynomialParts[i].Contains(letterCharacter) && !polynomialParts[i].Contains('^'))
                             {
-                                withLettersParts.Add(polynomialParts[i - 1]);
-                                withLettersParts.Add(polynomialParts[i]);
+                                int letterCount = polynomialParts[i].Count(char.IsLetter);
+                                if (letterCount > 1)
+                                {
+                                    withLettersParts.Add(polynomialParts[i - 1] + "Duplicate" + Convert.ToString(i));
+                                    withLettersParts.Add(polynomialParts[i] + "Duplicate" + Convert.ToString(i));
+                                }
+                                else
+                                {
+                                    withLettersParts.Add(polynomialParts[i - 1]);
+                                    withLettersParts.Add(polynomialParts[i]);
+                                }
+
                             }
                         }
                     }
@@ -138,8 +152,17 @@
                         {
                             if (polynomialParts[i].Contains(letterCharacter) && !polynomialParts[i].Contains('^'))
                             {
-                                withLettersParts.Add(polynomialParts[i - 1]);
-                                withLettersParts.Add(polynomialParts[i]);
+                                int letterCount = polynomialParts[i].Count(char.IsLetter);
+                                if (letterCount > 1)
+                                {
+                                    withLettersParts.Add(polynomialParts[i - 1] + "Duplicate" + Convert.ToString(i));
+                                    withLettersParts.Add(polynomialParts[i] + "Duplicate" + Convert.ToString(i));
+                                }
+                                else
+                                {
+                                    withLettersParts.Add(polynomialParts[i - 1]);
+                                    withLettersParts.Add(polynomialParts[i]);
+                                }
 
                             }
                         }
@@ -153,7 +176,7 @@
                 {
                     if (polynomialParts[i - 1] != "*" && polynomialParts[i - 1] != "/" && polynomialParts[i + 1] != "*" && polynomialParts[i + 1] != "/")
                     {
-                        if (!polynomialParts[i].Any(char.IsLetter))
+                        if (polynomialParts[i].Any(char.IsLetter) == false)
                         {
                             noLetterParts.Add(polynomialParts[i - 1]);
                             noLetterParts.Add(polynomialParts[i]);
@@ -168,14 +191,13 @@
                     {
                         leaveBeParts.Add(polynomialParts[i - 1]);
                         leaveBeParts.Add(polynomialParts[i]);
-                        //break;
                     }
                 }
                 else
                 {
                     if (polynomialParts[i - 1] != "*" && polynomialParts[i - 1] != "/" && charsToCheck.Any(polynomialParts[i].Contains) == false)
                     {
-                        if (!polynomialParts[i].Any(char.IsLetter))
+                        if (polynomialParts[i].Any(char.IsLetter) == false)
                         {
                             noLetterParts.Add(polynomialParts[i - 1]);
                             noLetterParts.Add(polynomialParts[i]);
@@ -197,6 +219,58 @@
                     }
                 }
             }
+
+            int withLettersPartCount = withLettersParts.Count;
+            var DuplicateSaved = false;
+            string firstDuplicateNumber = "";
+
+            string secondDuplicateNumber = "";
+            int count = -1;
+
+            for (int i = 0; i < withLettersPartCount; i++)
+            {
+                if (count == 0)
+                {
+                    DuplicateSaved = false;
+                }
+                if (withLettersParts[i].Contains("Duplicate")
+                    && (withLettersParts[i].Contains('+') == false && withLettersParts[i].Contains('-') == false && withLettersParts[i].Contains('*') == false && withLettersParts[i].Contains('/') == false)
+                    && DuplicateSaved == false)
+                {
+                    Match match = Regex.Match(withLettersParts[i], @"\d+$");
+                    firstDuplicateNumber = match.Value;
+
+                    count = withLettersParts.Count(item => item.Contains($"Duplicate{firstDuplicateNumber}"));
+
+                    withLettersParts[i - 1] = withLettersParts[i - 1].Replace($"Duplicate{firstDuplicateNumber}", "");
+                    count--;
+                    withLettersParts[i] = withLettersParts[i].Replace($"Duplicate{firstDuplicateNumber}", "");
+                    count--;
+                    DuplicateSaved = true;
+                }
+
+                if (withLettersParts[i].Contains("Duplicate")
+                    && (withLettersParts[i].Contains('+') == false && withLettersParts[i].Contains('-') == false && withLettersParts[i].Contains('*') == false && withLettersParts[i].Contains('/') == false)
+                    && DuplicateSaved == true)
+                {
+                    Match match = Regex.Match(withLettersParts[i], @"\d+$");
+                    secondDuplicateNumber = match.Value;
+                    if (secondDuplicateNumber == firstDuplicateNumber)
+                    {
+                        withLettersParts[i - 1] = "DELETE";
+                        count--;
+                        withLettersParts[i] = "DELETE";
+                        count--;
+                    }
+                }
+            }
+
+            while (withLettersParts.Contains("DELETE"))
+            {
+                withLettersParts.Remove("DELETE");
+            }
+
+
 
             List<string> newPolynomialPart1 = leaveBeParts.Concat(withLettersParts).ToList();
             List<string> newPolynomial = newPolynomialPart1.Concat(noLetterParts).ToList();
@@ -389,14 +463,13 @@
             }
         }
 
-
         public static (List<string> polynomialParts, string differentLetters) FromStringToListOrganize(string polynomial)
         {
-            polynomial = ProcessAndOrganize.ProcessPolynomial(polynomial);
+            polynomial = ProcessPolynomial(polynomial);
 
-            string differentLetters = ProcessAndOrganize.CheckLetters(polynomial);
+            string differentLetters = CheckLetters(polynomial);
 
-            List<string> polynomialParts = ProcessAndOrganize.OrganizePolynomial(polynomial, differentLetters);
+            List<string> polynomialParts = OrganizePolynomial(polynomial, differentLetters);
 
             return (polynomialParts, differentLetters);
         }
