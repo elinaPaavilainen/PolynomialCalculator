@@ -1,10 +1,11 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Security.Cryptography.X509Certificates;
+using System.Text.RegularExpressions;
 
 namespace Calculator2
 {
     public static class ProcessAndOrganize
     {
-        private static char[] charsToCheck = { '*', '/', '+', '-' };
+        private static readonly char[] charsToCheck = { '*', '/', '+', '-' };
 
         public static string ProcessPolynomial(string polynomial)
         {
@@ -316,7 +317,7 @@ namespace Calculator2
                     }
                     if (polynomialPartsCount > 4)
                     {
-                        if ((polynomialParts[i] == "+" || polynomialParts[i] == "-") && (polynomialParts[i + 2] == "*" || polynomialParts[i + 2] == "/") && (polynomialParts[i + 4] != "*" || polynomialParts[i + 4] != "/"))
+                        if ((polynomialParts[i] == "+" || polynomialParts[i] == "-") && (polynomialParts[i + 2] == "*" || polynomialParts[i + 2] == "/") && (polynomialParts[i + 4] != "*" && polynomialParts[i + 4] != "/"))
                         {
                             partsToReturn.Add(polynomialParts[i]);
                             partsToReturn.Add(polynomialParts[i + 1]);
@@ -479,7 +480,81 @@ namespace Calculator2
             polynomial = ProcessPolynomial(polynomial);
             string[] polynomialPartsArray = polynomial.Split(' ');
             List<string> polynomialParts = polynomialPartsArray.ToList();
+            polynomialParts.RemoveAll(item => string.IsNullOrEmpty(item));
             return polynomialParts;
+        }
+
+        public static string AssignValueToVariable(string input, string finalPolynomial)
+        {
+            string polynomial;
+            List<string> polynomialParts;
+            input.Replace(" ", "");
+            int indexOfVariableLetter = input.IndexOf('=') - 1;
+            int indexOfVariableNumber = input.IndexOf("=") + 1;
+            char letter = input[indexOfVariableLetter];
+
+            int indexOfLetterInPolynomial = finalPolynomial.IndexOf(letter);
+            string variableNumber = "";
+
+            if (finalPolynomial[indexOfLetterInPolynomial - 1] == '/')
+            {
+                variableNumber = input.Substring(indexOfVariableNumber);
+            }
+            else
+            {
+                variableNumber = "*" + input.Substring(indexOfVariableNumber);
+            }
+            polynomial = finalPolynomial.Replace(Convert.ToString(input[indexOfVariableLetter]), variableNumber);
+
+            polynomialParts = ProcessAndOrganize.FromStringToList(polynomial);
+
+            for (int i = 0; i < polynomialParts.Count; i++)
+            {
+                if (polynomialParts[i].Contains('^') && !polynomialParts[i].Any(c => char.IsLetter(c)))
+                {
+                    int indexOfPower = polynomialParts[i].IndexOf('^');
+                    int baseNum = Convert.ToInt32(polynomialParts[i].Substring(0, indexOfPower));
+                    int power = Convert.ToInt32(polynomialParts[i].Substring(indexOfPower + 1));
+                    string powerResult = Convert.ToString(Math.Pow(baseNum, power));
+
+                    polynomialParts[i] = powerResult;
+                    polynomial = string.Join("", polynomialParts);
+                }
+            }
+            return polynomial;
+        }
+        public static List<string> CleanFinalPolynomial(List<string> usedParts)
+        {
+            for (int i = 0; i < usedParts.Count; i++)
+            {
+                if (usedParts[0] == "+")
+                {
+                    usedParts[0] = "";
+                }
+                if (usedParts[i] == "0")
+                {
+                    if (usedParts.Count > 2)
+                    {
+                        usedParts[i - 1] = "";
+                        usedParts[i] = "";
+                    }
+                }
+                if (usedParts[i].Length > 1)
+                {
+                    if (usedParts[i][0] == '1' && Char.IsLetter(usedParts[i][1]))
+                    {
+                        usedParts[i] = usedParts[i].Remove(0, 1);
+                    }
+                }
+                if (i > 1)
+                {
+                    if ((usedParts[i - 1] == "*" || usedParts[i - 1] == "/") && usedParts[i] == "+")
+                    {
+                        usedParts.RemoveAt(i);
+                    }
+                }
+            }
+            return usedParts;
         }
     }
 }

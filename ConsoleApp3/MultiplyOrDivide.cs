@@ -116,6 +116,17 @@ namespace Calculator2
                 }
                 else
                 {
+                    foreach (var letter in firstLetters)
+                    {
+                        if (secondLetters.Contains(letter))
+                        {
+                            var powerLetter = letter + "^" + "2";
+                            secondLetters = secondLetters.Replace(Convert.ToString(letter), powerLetter);
+                            firstLetters = firstLetters.Replace(Convert.ToString(letter), "");
+                        }
+                    }
+
+
                     if (powerFirst == 0 && powerSecond == 0)
                     {
                         int result = Convert.ToInt32(firstNumbers) * Convert.ToInt32(secondNumbers);
@@ -126,12 +137,12 @@ namespace Calculator2
                         }
                         return finalResult;
                     }
-                    else 
+                    else
                     {
                         first = first + "^" + Convert.ToString(powerFirst);
                         second = second + "^" + Convert.ToString(powerSecond);
                         return $"{operate}{first} * {second}";
-                    }                      
+                    }
                 }
             }
         }
@@ -157,8 +168,6 @@ namespace Calculator2
             }
             else
             {
-                
-
                 var firstNumbers = CheckLettersAndNumbers.CheckNumbers(first);
                 var firstLetters = CheckLettersAndNumbers.CheckLetters(first);
 
@@ -175,8 +184,7 @@ namespace Calculator2
                     secondNumbers = "1";
                 }
 
-                //jaa tämä eri osiin
-                if (firstLetters == secondLetters)// || firstLetters == "" || secondLetters == "")
+                if (firstLetters == secondLetters)
                 {
                     firstNumbers = operate + firstNumbers;
 
@@ -188,20 +196,6 @@ namespace Calculator2
                     }
                     string finalResult = resultNumber;
 
-                    //if (firstLetters != "" && secondLetters == "")
-                    //{
-                    //    finalResult = resultNumber + firstLetters;
-                    //}
-
-                    //else if (firstLetters == "" && secondLetters != "")
-                    //{
-                    //    finalResult = resultNumber + secondLetters;
-                    //}
-
-                    //else if (firstLetters != "" && secondLetters != "")
-                    //{
-                    //    finalResult = resultNumber;
-                    //}
                     return finalResult;
                 }
                 else if (secondLetters == "" && secondNumbers == "1")
