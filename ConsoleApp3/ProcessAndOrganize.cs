@@ -121,8 +121,6 @@ namespace Calculator2
             List<string> noLetterParts = new List<string>();
             List<string> leaveBeParts = new List<string>();
 
-            //string letters = new string(polynomialParts[i].Where(char.IsLetter).ToArray());
-
             foreach (var letterCharacter in differentLetters)
             {
                 for (int i = 1; i < polynomialPartsCount; i++)
@@ -511,15 +509,15 @@ namespace Calculator2
             {
                 var finalPolynomialParts = FromStringToList(finalPolynomial);
 
-                int numberAssigned = Convert.ToInt32(input.Substring(indexOfVariableNumber));            
-
+                double numberAssigned = Convert.ToDouble(input.Substring(indexOfVariableNumber));            
+                
                 for (int i = 0; i < finalPolynomialParts.Count; i++)
                 {
                     if (finalPolynomialParts[i].Contains(letter))
                     {
                         string numberPart = Regex.Match(finalPolynomialParts[i], @"\d+").Value;
 
-                        string resultNumber = Convert.ToString(Convert.ToInt32(numberPart) * numberAssigned);
+                        string resultNumber = Convert.ToString(Convert.ToDouble(numberPart) * numberAssigned);
 
 
                         int index = finalPolynomialParts[i].IndexOf(letter);
@@ -544,8 +542,8 @@ namespace Calculator2
                 if (polynomialParts[i].Contains('^') && !polynomialParts[i].Any(c => char.IsLetter(c)))
                 {
                     int indexOfPower = polynomialParts[i].IndexOf('^');
-                    int baseNum = Convert.ToInt32(polynomialParts[i].Substring(0, indexOfPower));
-                    int power = Convert.ToInt32(polynomialParts[i].Substring(indexOfPower + 1));
+                    double baseNum = Convert.ToDouble(polynomialParts[i].Substring(0, indexOfPower));
+                    double power = Convert.ToDouble(polynomialParts[i].Substring(indexOfPower + 1));
                     string powerResult = Convert.ToString(Math.Pow(baseNum, power));
 
                     polynomialParts[i] = powerResult;

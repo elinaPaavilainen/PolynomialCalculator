@@ -19,7 +19,7 @@ namespace Calculator2
             {
                 first = operate + first;
 
-                int resultInt = Convert.ToInt32(first) * Convert.ToInt32(second);
+                double resultInt = Convert.ToDouble(first) * Convert.ToDouble(second);
 
                 string result = Convert.ToString(resultInt);
                 if (resultInt >= 0)
@@ -59,7 +59,7 @@ namespace Calculator2
 
                     firstNumbers = operate + firstNumbers;
 
-                    int resultInt = Convert.ToInt32(firstNumbers) * Convert.ToInt32(secondNumbers);
+                    double resultInt = Convert.ToDouble(firstNumbers) * Convert.ToDouble(secondNumbers);
 
                     string resultNumber = Convert.ToString(resultInt);
                     if (resultInt >= 0)
@@ -129,7 +129,7 @@ namespace Calculator2
 
                     if (powerFirst == 0 && powerSecond == 0)
                     {
-                        int result = Convert.ToInt32(firstNumbers) * Convert.ToInt32(secondNumbers);
+                        double result = Convert.ToDouble(firstNumbers) * Convert.ToDouble(secondNumbers);
                         string finalResult = result.ToString() + firstLetters + secondLetters;
                         if (result > 0)
                         {
@@ -213,7 +213,7 @@ namespace Calculator2
                 {
                     firstNumbers = operate + firstNumbers;
 
-                    int result = Convert.ToInt32(firstNumbers) / Convert.ToInt32(secondNumbers);
+                    double result = Convert.ToDouble(firstNumbers) / Convert.ToDouble(secondNumbers);
                     string resultNumber = Convert.ToString(result);
                     if (result >= 0)
                     {
@@ -230,7 +230,7 @@ namespace Calculator2
                 {
                     firstNumbers = operate + firstNumbers;
 
-                    int result = Convert.ToInt32(firstNumbers) / Convert.ToInt32(secondNumbers);
+                    double result = Convert.ToDouble(firstNumbers) / Convert.ToDouble(secondNumbers);
                     string resultNumber = Convert.ToString(result);
                     if (result >= 0)
                     {

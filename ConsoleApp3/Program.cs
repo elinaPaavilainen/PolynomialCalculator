@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-
-namespace Calculator2
+﻿namespace Calculator2
 {
     public class Program
     {

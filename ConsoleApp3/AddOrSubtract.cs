@@ -25,7 +25,7 @@ namespace Calculator2
                 {
                     first = operate + first;
                 }
-                int result = Convert.ToInt32(first) + Convert.ToInt32(second);
+                double result = Convert.ToDouble(first) + Convert.ToDouble(second);
                 return Convert.ToString(result);
             }
             else
@@ -42,7 +42,7 @@ namespace Calculator2
                     {
                         firstNumbers = operate + firstNumbers;
                     }
-                    int result = Convert.ToInt32(firstNumbers) + Convert.ToInt32(secondNumbers);
+                    double result = Convert.ToDouble(firstNumbers) + Convert.ToDouble(secondNumbers);
                     string resultNumber = Convert.ToString(result);
                     string finalResult = resultNumber + firstLetters;
                     return finalResult;
@@ -69,7 +69,7 @@ namespace Calculator2
                 {
                     first = operate + first;
                 }
-                int result = Convert.ToInt32(first) - Convert.ToInt32(second);
+                double result = Convert.ToDouble(first) - Convert.ToDouble(second);
                 return Convert.ToString(result);
             }
             else
@@ -86,7 +86,7 @@ namespace Calculator2
                     {
                         firstNumbers = operate + firstNumbers;
                     }
-                    int result = Convert.ToInt32(firstNumbers) - Convert.ToInt32(secondNumbers);
+                    double result = Convert.ToDouble(firstNumbers) - Convert.ToDouble(secondNumbers);
                     string resultNumber = Convert.ToString(result);
 
                     if (result == 0)
