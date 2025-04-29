@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Calculator2
 {
@@ -494,17 +495,47 @@ namespace Calculator2
             char letter = input[indexOfVariableLetter];
 
             int indexOfLetterInPolynomial = finalPolynomial.IndexOf(letter);
-            string variableNumber = "";
+            string assignedNumber = "";
 
             if (finalPolynomial[indexOfLetterInPolynomial - 1] == '/')
             {
-                variableNumber = input.Substring(indexOfVariableNumber);
+                assignedNumber = input.Substring(indexOfVariableNumber);
+                polynomial = finalPolynomial.Replace(Convert.ToString(input[indexOfVariableLetter]), assignedNumber);
+            }
+            else if (char.IsLetterOrDigit(finalPolynomial[indexOfLetterInPolynomial - 1]) == false)
+            { 
+                assignedNumber = input.Substring(indexOfVariableNumber);
+                polynomial = finalPolynomial.Replace(Convert.ToString(input[indexOfVariableLetter]), assignedNumber);
             }
             else
             {
-                variableNumber = "*" + input.Substring(indexOfVariableNumber);
+                var finalPolynomialParts = FromStringToList(finalPolynomial);
+
+                int numberAssigned = Convert.ToInt32(input.Substring(indexOfVariableNumber));            
+
+                for (int i = 0; i < finalPolynomialParts.Count; i++)
+                {
+                    if (finalPolynomialParts[i].Contains(letter))
+                    {
+                        string numberPart = Regex.Match(finalPolynomialParts[i], @"\d+").Value;
+
+                        string resultNumber = Convert.ToString(Convert.ToInt32(numberPart) * numberAssigned);
+
+
+                        int index = finalPolynomialParts[i].IndexOf(letter);
+
+                        var partToReplace = finalPolynomialParts[i].Substring(0, index);
+                        var partToRemain = finalPolynomialParts[i].Substring(index);
+
+
+                        finalPolynomialParts[i] = finalPolynomialParts[i].Replace(numberPart, Convert.ToString(resultNumber));
+                        finalPolynomialParts[i] = finalPolynomialParts[i].Replace(Convert.ToString(letter), "");
+                    }
+                 }
+
+                polynomial = string.Join("", finalPolynomialParts);
             }
-            polynomial = finalPolynomial.Replace(Convert.ToString(input[indexOfVariableLetter]), variableNumber);
+
 
             polynomialParts = ProcessAndOrganize.FromStringToList(polynomial);
 
