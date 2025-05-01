@@ -483,75 +483,136 @@ namespace Calculator2
             return polynomialParts;
         }
 
-        public static string AssignValueToVariable(string input, string finalPolynomial)
+        public static string AssignValueToVariable(string input, string polynomial)
         {
-            string polynomial;
-            List<string> polynomialParts;
+
+            List<string> polynomialParts = FromStringToList(polynomial);
             input.Replace(" ", "");
-            int indexOfVariableLetter = input.IndexOf('=') - 1;
-            int indexOfVariableNumber = input.IndexOf("=") + 1;
-            char letter = input[indexOfVariableLetter];
-
-            int indexOfLetterInPolynomial = finalPolynomial.IndexOf(letter);
-            string assignedNumber = "";
-
-            if (finalPolynomial[indexOfLetterInPolynomial - 1] == '/')
-            {
-                assignedNumber = input.Substring(indexOfVariableNumber);
-                polynomial = finalPolynomial.Replace(Convert.ToString(input[indexOfVariableLetter]), assignedNumber);
-            }
-            else if (char.IsLetterOrDigit(finalPolynomial[indexOfLetterInPolynomial - 1]) == false)
-            { 
-                assignedNumber = input.Substring(indexOfVariableNumber);
-                polynomial = finalPolynomial.Replace(Convert.ToString(input[indexOfVariableLetter]), assignedNumber);
-            }
-            else
-            {
-                var finalPolynomialParts = FromStringToList(finalPolynomial);
-
-                double numberAssigned = Convert.ToDouble(input.Substring(indexOfVariableNumber));            
-                
-                for (int i = 0; i < finalPolynomialParts.Count; i++)
-                {
-                    if (finalPolynomialParts[i].Contains(letter))
-                    {
-                        string numberPart = Regex.Match(finalPolynomialParts[i], @"\d+").Value;
-
-                        string resultNumber = Convert.ToString(Convert.ToDouble(numberPart) * numberAssigned);
 
 
-                        int index = finalPolynomialParts[i].IndexOf(letter);
-
-                        var partToReplace = finalPolynomialParts[i].Substring(0, index);
-                        var partToRemain = finalPolynomialParts[i].Substring(index);
-
-
-                        finalPolynomialParts[i] = finalPolynomialParts[i].Replace(numberPart, Convert.ToString(resultNumber));
-                        finalPolynomialParts[i] = finalPolynomialParts[i].Replace(Convert.ToString(letter), "");
-                    }
-                 }
-
-                polynomial = string.Join("", finalPolynomialParts);
-            }
-
-
-            polynomialParts = ProcessAndOrganize.FromStringToList(polynomial);
+            var inputLetter = Convert.ToString(input[0]);
+            var inputNumber = input.Substring(input.IndexOf("=") + 1);
 
             for (int i = 0; i < polynomialParts.Count; i++)
             {
-                if (polynomialParts[i].Contains('^') && !polynomialParts[i].Any(c => char.IsLetter(c)))
+                if (polynomialParts[i].Contains(inputLetter))
                 {
-                    int indexOfPower = polynomialParts[i].IndexOf('^');
-                    double baseNum = Convert.ToDouble(polynomialParts[i].Substring(0, indexOfPower));
-                    double power = Convert.ToDouble(polynomialParts[i].Substring(indexOfPower + 1));
-                    string powerResult = Convert.ToString(Math.Pow(baseNum, power));
+                    if (polynomialParts[i].Contains('^'))
+                    {
+                        int indexOfLetter = polynomialParts[i].IndexOf(inputLetter);
+                        int indexOfPowerSymbol = polynomialParts[i].IndexOf('^');
 
-                    polynomialParts[i] = powerResult;
-                    polynomial = string.Join("", polynomialParts);
+                        if (indexOfPowerSymbol - indexOfLetter == 1)
+                        {
+                            double baseNum = Convert.ToDouble(inputNumber);
+                            double power = Convert.ToDouble(polynomialParts[i].Substring(indexOfPowerSymbol + 1));
+                            string powerResult = Convert.ToString(Math.Pow(baseNum, power));
+
+                            try
+                            {
+                                if (char.IsNumber(polynomialParts[i][indexOfLetter - 1]))
+                                {
+                                    polynomialParts[i] = polynomialParts[i].Replace(inputLetter, "*");
+                                    polynomialParts[i] = polynomialParts[i].Replace("^" + power, powerResult);
+
+                                }
+                                else if (char.IsLetter(polynomialParts[i][indexOfLetter - 1]))
+                                {
+                                    polynomialParts[i] = polynomialParts[i].Replace(inputLetter, "");
+                                    polynomialParts[i] = polynomialParts[i].Replace("^" + power, "");
+
+                                    if (polynomialParts[i].Any(c => char.IsNumber(c)))
+                                    {
+                                        double numbers = Convert.ToDouble(new string(polynomialParts[i].Where(char.IsDigit).ToArray()));
+                                        double result = numbers * Convert.ToDouble(powerResult);
+                                        polynomialParts[i] = polynomialParts[i].Replace(Convert.ToString(numbers), Convert.ToString(result));
+                                    }
+                                    
+                                }
+                            }
+                            catch
+                            {
+                                polynomialParts[i] = polynomialParts[i].Replace(inputLetter, "");
+                                polynomialParts[i] = polynomialParts[i].Replace("^" + power, powerResult);
+                            }
+                        }
+                    }
+
+                    if (polynomialParts[i] == inputLetter)
+                    {
+                        polynomialParts[i] = inputNumber;
+                    }
+
+                    if (polynomialParts[i] != inputLetter && polynomialParts[i].Contains("^") == false)
+                    {
+                        polynomialParts[i] = polynomialParts[i].Replace(inputLetter, "*" + inputNumber);
+                    }
                 }
             }
+            polynomial = string.Join("", polynomialParts);
             return polynomial;
         }
+
+
+
+
+
+        //if (finalPolynomial[indexOfLetterInPolynomial - 1] == '/')
+        //{
+        //    assignedNumber = input.Substring(indexOfVariableNumber);
+        //    polynomial = finalPolynomial.Replace(Convert.ToString(input[indexOfAssignedLetter]), assignedNumber);
+        //}
+        //else if (char.IsLetterOrDigit(finalPolynomial[indexOfLetterInPolynomial - 1]) == false)
+        //{
+        //    assignedNumber = input.Substring(indexOfVariableNumber);
+        //    polynomial = finalPolynomial.Replace(Convert.ToString(input[indexOfAssignedLetter]), assignedNumber);
+        //}
+        //else
+        //{
+        //    var finalPolynomialParts = FromStringToList(finalPolynomial);
+
+        //    double numberAssigned = Convert.ToDouble(input.Substring(indexOfVariableNumber));
+
+        //    for (int i = 0; i < finalPolynomialParts.Count; i++)
+        //    {
+        //        if (finalPolynomialParts[i].Contains(letter))
+        //        {
+        //            string numberPart = Regex.Match(finalPolynomialParts[i], @"\d+").Value;
+
+        //            string resultNumber = Convert.ToString(Convert.ToDouble(numberPart) * numberAssigned);
+
+
+        //            int index = finalPolynomialParts[i].IndexOf(letter);
+
+        //            var partToReplace = finalPolynomialParts[i].Substring(0, index);
+        //            var partToRemain = finalPolynomialParts[i].Substring(index);
+
+
+        //            finalPolynomialParts[i] = finalPolynomialParts[i].Replace(numberPart, Convert.ToString(resultNumber));
+        //            finalPolynomialParts[i] = finalPolynomialParts[i].Replace(Convert.ToString(letter), "");
+        //        }
+        //    }
+
+        //    polynomial = string.Join("", finalPolynomialParts);
+        //}
+
+
+        //polynomialParts = ProcessAndOrganize.FromStringToList(polynomial);
+
+        //for (int i = 0; i < polynomialParts.Count; i++)
+        // {
+        //if (polynomialParts[i].Contains('^') && !polynomialParts[i].Any(c => char.IsLetter(c)))
+        //{
+        //    int indexOfPower = polynomialParts[i].IndexOf('^');
+        //    double baseNum = Convert.ToDouble(polynomialParts[i].Substring(0, indexOfPower));
+        //    double power = Convert.ToDouble(polynomialParts[i].Substring(indexOfPower + 1));
+        //    string powerResult = Convert.ToString(Math.Pow(baseNum, power));
+
+        //    polynomialParts[i] = powerResult;
+        //    polynomial = string.Join("", polynomialParts);
+        //}
+        // }
+
         public static List<string> CleanFinalPolynomial(List<string> usedParts)
         {
             for (int i = 0; i < usedParts.Count; i++)
