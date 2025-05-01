@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Calculator2
+﻿namespace Calculator2
 {
     public static class GoThroughPolynomial
     {
